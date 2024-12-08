@@ -98,5 +98,15 @@
             "Computer Science",
             "Math"
         ]
+    },
+    {
+        "id": 201,
+        "name": "Mahesh Babu",
+        "age": 22,
+        "grade": "A",
+        "subjects": [
+            "Maths",
+            "Science"
+        ]
     }
 ]

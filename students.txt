@@ -118,5 +118,15 @@
             "Science",
             "English"
         ]
+    },
+    {
+        "id": 203,
+        "name": "Samay Pareek",
+        "age": 23,
+        "grade": "A",
+        "subjects": [
+            "Science",
+            "Maths"
+        ]
     }
 ]

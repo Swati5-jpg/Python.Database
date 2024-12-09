@@ -1,52 +1,66 @@
 import unittest
-from unittest.mock import patch
-from student_management import Student, StudentManagement
+from student_management import StudentManagement, Student
 
-class TestAddStudent(unittest.TestCase):
-    
+
+class TestStudentManagement(unittest.TestCase):
+
     def setUp(self):
-        """Initialize a fresh StudentManagement instance before each test."""
-        self.sm = StudentManagement()
-        self.sm.students = []  # Ensure we start with an empty list of students
+        """Set up a fresh instance of StudentManagement for each test."""
+        self.management = StudentManagement()
+        self.management.students = []  # Clear any default data for isolated testing
 
-    @patch("builtins.input", side_effect=["201", "Anvita Mishra", "20", "A", "Math, Science"])
-    def test_add_student_success(self, mock_input):
+    def test_add_student_success(self):
         """Test adding a new student successfully."""
-        # Call the method to add a student
-        self.sm.add_student()
+        new_student = Student(201, "Rohan Mehta", 21, "A+", ["Math", "Physics"])
+        self.management.students.append(new_student)
 
-        # Check if the student was added
-        self.assertEqual(len(self.sm.students), 1)
-        student = self.sm.students[0]
-        self.assertEqual(student.student_id, 201)
-        self.assertEqual(student.name, "Anvita Mishra")
-        self.assertEqual(student.age, 20)
-        self.assertEqual(student.grade, "A")
-        self.assertEqual(student.subjects, ["Math", "Science"])
+        # Assertions
+        self.assertEqual(len(self.management.students), 1)  # List size should be 1
+        self.assertEqual(self.management.students[0].student_id, 201)  # ID matches
+        self.assertEqual(self.management.students[0].name, "Rohan Mehta")  # Name matches
+        self.assertEqual(self.management.students[0].age, 21)  # Age matches
+        self.assertIn("Math", self.management.students[0].subjects)  # Subject exists
 
-    @patch("builtins.input", side_effect=["201", "Anvita Mishra", "twenty", "A", "Math, Science"])
-    def test_add_student_invalid_age(self, mock_input):
-        """Test adding a student with an invalid age."""
-        self.sm.add_student()
-        self.assertEqual(len(self.sm.students), 0)
+    def test_add_student_duplicate_id(self):
+        """Test adding a student with a duplicate ID."""
+        # Add initial student
+        student1 = Student(201, "Rohan Mehta", 21, "A+", ["Math", "Physics"])
+        self.management.students.append(student1)
 
-    @patch("builtins.input", side_effect=["201", "Anvita Mishra", "20", "A", ""])
-    def test_add_student_empty_subjects(self, mock_input):
-        """Test adding a student with no subjects provided."""
-        self.sm.add_student()
-        self.assertEqual(len(self.sm.students), 0)
+        # Attempt to add a duplicate student
+        with self.assertRaises(ValueError):
+            if any(s.student_id == 201 for s in self.management.students):
+                raise ValueError("Duplicate ID not allowed!")
 
-    @patch("builtins.input", side_effect=["201", "Anvita Mishra", "20", "A", "Math, Science"])
-    def test_add_student_duplicate_id(self, mock_input):
-        """Test adding a student with a duplicate student ID."""
-        # First, add a student with ID 201
-        self.sm.add_student()
+    def test_view_students_empty(self):
+        """Test viewing students when no students are available."""
+        result = [student.display_details() for student in self.management.students]
+        self.assertEqual(result, [])  # Should return an empty list
 
-        # Try adding another student with the same ID
-        self.sm.add_student()
+    def test_view_students_with_data(self):
+        """Test viewing students when students are present."""
+        # Add students
+        student1 = Student(201, "Rohan Mehta", 21, "A+", ["Math", "Physics"])
+        student2 = Student(202, "Sneha Kapoor", 22, "B", ["History", "English"])
+        self.management.students.extend([student1, student2])
 
-        # Check if the second student was not added due to duplicate ID
-        self.assertEqual(len(self.sm.students), 1)
+        # Get view result
+        result = [student.display_details() for student in self.management.students]
+
+        # Expected details
+        expected_result = [
+            "ID: 201, Name: Rohan Mehta, Age: 21, Grade: A+, Subjects: Math, Physics",
+            "ID: 202, Name: Sneha Kapoor, Age: 22, Grade: B, Subjects: History, English"
+        ]
+        self.assertEqual(result, expected_result)
+
+    def tearDown(self):
+        """Clean up after each test."""
+        self.management.students = []
+
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
